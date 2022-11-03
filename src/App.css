@@ -1,0 +1,30 @@
+//a few flexboxes
+//would be better to have partial files and combine them
+//Sass is cool :D
+.Header-container-left {
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: flex-start;
+}
+
+.Header-container-right {
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: flex-end;
+}
+
+.entryfields-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around ;
+}
+
+.entryfields-column {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around ;
+}
+
+.Body {
+	margin: 50px;
+}
