@@ -1,30 +1,37 @@
 //a few flexboxes
 //would be better to have partial files and combine them
-//Sass is cool :D
-.Header-container-left {
-	display: flex;
-	flex-wrap: nowrap;
-	justify-content: flex-start;
-}
-
-.Header-container-right {
-	display: flex;
-	flex-wrap: nowrap;
-	justify-content: flex-end;
-}
+//Sass is cool
 
 .entryfields-container {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-around ;
+	margin-top: 5px;
 }
 
-.entryfields-column {
-	display: flex;
-	flex-direction: column;
-	justify-content: space-around ;
+.App {
+	height: 100%;
 }
 
-.Body {
-	margin: 50px;
+.MainContainer {
+	height: 100%;
+	background-color: transparent;
+	margin-top: 12px;
+}
+
+.btnMargin {
+	margin-top: 25px;
+}
+
+.maxWidth800 {
+	max-width: 800px;
+}
+
+.subtleLabel {
+	font-weight: 400;
+}
+
+.SplashHeader {
+	margin: 0 0 0 40px;
+}
+.SplashSubHeader {
+	margin: 0 0 0 40px;
+	min-height: 50px;
 }
