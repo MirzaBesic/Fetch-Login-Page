@@ -5,7 +5,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 # Fetch Rewards Login Page
 
-A pretty simple login form page using React & Bootstrap React
+A pretty simple login form page using primarily React & Bootstrap React. bcrypt used for hashing.
 
 NPM (node packet manager) was used to install all necessary dependencies - hopefully all obsolete packages were removed
 
@@ -17,11 +17,11 @@ Download [NPM] (https://docs.npmjs.com/downloading-and-installing-node-js-and-np
 
 Download entire repository into a local folder (Node_modules dependencies are not included in GitHub repository due to size)
 
-Via terminal (i.e. text/powershell/command line), change directory to top level of downloaded repository
+In the terminal (i.e. text/powershell/command line), change directory to top containing folder of downloaded repository. ("cd <file path to top folder> (where src and public folders are)")
 
-In the terminal, install dependencies included in package.json / package-lock.json. **Install dependencies by calling "npm install" from the terminal **
+In the terminal, install dependencies included in package.json / package-lock.json. *Install dependencies by calling "npm install" from the terminal*
 
-In the terminal, run "npm start" to launch localhost deployment of web page
+In the terminal, run "npm start" to launch localhost deployment of web page - a webpage should launch in default browser
 
 # Misc notes on project
 
