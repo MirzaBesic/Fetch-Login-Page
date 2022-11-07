@@ -9,10 +9,6 @@ A pretty simple login form page using React & Bootstrap React
 
 NPM (node packet manager) was used to install all necessary dependencies - hopefully all obsolete packages were removed
 
-+create-react-app
-
-+React-Bootstrap
-
 # Install / Run
 
 Instructions for Windows:
