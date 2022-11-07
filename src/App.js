@@ -11,17 +11,9 @@ import Col from 'react-bootstrap/Col'
 import { useState, useEffect } from "react";
 
 /** 
-todo:
-properly load states and jobs up front (again)
-style updates
-	max widths on fields
-	some flourishes
-all fields filled - form validation
-code cleanup and comments
-
 Nice to have improvements:
 Multiple files - currently have all these components piled in one file - should create generic files and import for improved modularity
-UI flourishes - more inspired UI/UX design. 
+UI flourishes - more inspired UI/UX design. Used basic bootstrap components but for a fully designed web page would include a lot more visual content
 **/
 
 function App() {
@@ -41,9 +33,8 @@ const Header = () => {
 		window.location.reload();
 	  };
 	
-	
 	return (
-		<Navbar  bg="light" variant="light" className="fixed-top">
+		<Navbar bg="light" variant="light" className="fixed-top">
 			<Container className="justify-content-start">
 				<Navbar.Brand href="#home">Fetch Rewards</Navbar.Brand>
 				<NavDropdown title="Offers" className="me-auto" bg="dark" variant="dark">
@@ -61,7 +52,7 @@ const Header = () => {
 	);
 };
 
-const MainBody = (props) => {
+const MainBody = () => {
 	
 	const bcrypt = require('bcryptjs');
 	
@@ -72,19 +63,21 @@ const MainBody = (props) => {
 	const [job, setJob] = React.useState("");
 	const [stateFrom, setStateFrom] = React.useState("");
 	
-	//properties to be loaded from GET
+	//properties to be loaded from GET request
 	const [jobsOptions, setJobsOptions] = React.useState([]);
 	const [stateOptions, setStateOptions] = React.useState([]);
 	const jobs = [];
 	const states = [];
 	
-	//validation hooks (WIP)
+	//validation hooks
 	const [validated, setValidated] = useState(false);
+	const [errorHit, setErrorHit] = useState(false);
 	
 	//GET request - utilizing browser fetch - https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
 	const loadOptions = async () => {
 		let request = new Request("https://frontend-take-home.fetchrewards.com/form", {method: 'GET'});
 		fetch(request).then((response) => {
+			//ok == 200 type response. 
 			if (!response.ok) {
 				throw new Error('GET request rejected - Error code:' + response.status)
 			}
@@ -101,12 +94,12 @@ const MainBody = (props) => {
 		});
 	};
 	
-	//on mounting, conduct the necessary post request
+	//on "mounting", conduct the necessary GET request
 	useEffect(() => {
 		loadOptions();
 	});
 	
-	//submission checker - React Bootstrap form validation
+	//submission checker - React Bootstrap form validation natively handles required fields and formatting
 	const handleSubmit = (event) => {
 		const form = event.currentTarget;
 		//can rely on Form validation from Bootstrap
@@ -115,18 +108,17 @@ const MainBody = (props) => {
 		  event.stopPropagation();
 		}
 		else {
-			setValidated(true);
-			submitFields(validated);
-			//can prevent default to keep page from refreshing
+
+			submitFields();
+			//prevent default to keep page from refreshing automatically
+			//in reality, would show confirmation screen for a few seconds then refreshing automatically / redirecting to home page
 			event.preventDefault();
 		}
 	  };
 		
-	//submission handler
-	const submitFields = (props) => 
-	{	
-		if (props.validated === false) { console.log(props.validated); }
-		
+	//submission handler - hashes password to avoid sending / storing plaintext
+	const submitFields = () => 
+	{			
 		bcrypt.genSalt(10, function(err, salt) {
 			bcrypt.hash(pw, salt, function(err, hash) {
 				const body = JSON.stringify(
@@ -145,57 +137,62 @@ const MainBody = (props) => {
 				headers: {'Accept': 'application/json', 'Content-Type': 'application/json'}
 			}).then((response) => {
 				if (!response.ok) {
+					setErrorHit(true);
 					throw new Error('POST request rejected - Error code:' + response.status)
 				}
+				setValidated(true);
 				return response.json();
 				});
 			});
 		});
-		
-		
 	};
-  
+
+	//would be better to turn Form into a external component (easier re-use in other pages / popups)
     return (
-		<>
-			<div className="text-primary font-weight-bold text-center">
-				<div className="text-primary font-weight-bold SplashHeader">
-					<h1 class="display-1">Today is the first day of the rest of your life</h1>
+		<div className="MainBodyWrapperDiv">
+			<div className="MainBodyContainerDiv">
+				<div className="text-primary font-weight-bold text-center mb-5" hidden={validated || errorHit}>
+					<div className="text-primary font-weight-bold">
+						<h1 className="display-1">It's the first day of the rest of your life</h1>
+					</div>
+					<div>
+						<h1 className="display-4">Give us some particulars and we'll do the rest...</h1>
+					</div>
 				</div>
-				<div className="SplashSubHeader">
-					<h1 class="display-4">Just give us some particulars and we'll do the rest...</h1>
-				</div>
+				<Container className="MainContainer">
+					<Form validated={validated} onSubmit={handleSubmit} hidden={validated || errorHit}>
+						<Row>
+							<Form.Group as={Col}>
+								<EntryField id="name" label="Full Name:" type="text" setter={setName} value={name}/>
+							</Form.Group>
+							<Form.Group as={Col}>
+								<EntryField id="email" label="Email:" type="email" setter={setEmail} value={email}/>
+							</Form.Group>
+							<Form.Group as={Col}>
+								<EntryField id="password" label="Password:" type="password" setter={setPw} value={pw}/>
+							</Form.Group>
+						</Row>
+						<Row>
+							<Col>
+								<Dropdown id="jobber" label="Occupation:" options={jobs} setter={setJob} />
+							</Col>
+							<Col>
+								<Dropdown id="liver" label="State:" options={states} setter={setStateFrom} />
+							</Col>
+							<Col>
+								<Button type="submit" className="BtnMargin">Sign me up!</Button>
+							</Col>
+						</Row>
+					</Form>
+					<div className="text-center text-success" hidden={!validated}>
+						<h1>You're signed up!</h1>
+					</div>
+					<div className="text-center text-danger" hidden={!errorHit}>
+						<h1>There was a problem submitting your info. Refresh the page and try again.</h1>
+					</div>
+				</Container>
 			</div>
-			<Container className="MainContainer">
-				<Form validated={validated} onSubmit={handleSubmit} hidden={validated}>
-					<Row>
-						<Form.Group as={Col}>
-							<EntryField id="name" label="Full Name:" type="text" setter={setName} value={name}/>
-						</Form.Group>
-						<Form.Group as={Col}>
-							<EntryField id="email" label="Email:" type="email" setter={setEmail} value={email}/>
-						</Form.Group>
-						<Form.Group as={Col}>
-							<EntryField id="password" label="Password:" type="password" setter={setPw} value={pw}/>
-						</Form.Group>
-					</Row>
-					<br/>
-					<Row className="entryfields-container">
-						<Col>
-							<Dropdown id="jobber" label="Occupation:" options={jobs} setter={setJob} />
-						</Col>
-						<Col>
-							<Dropdown id="liver" label="State:" options={states} setter={setStateFrom} />
-						</Col>
-						<Col>
-							<Button type="submit" className="btnMargin">Sign me up!</Button>
-						</Col>
-					</Row>
-				</Form>
-				<div className="text-center text-success" hidden={!validated}>
-					<h1>Form successfully submitted!</h1>
-				</div>
-			</Container>
-		</>
+		</div>
     );
 }
 
@@ -216,17 +213,16 @@ class EntryField extends React.Component {
 	render() {
 		return (
 			<>
-				<Form.Label className="subtleLabel">{this.label}</Form.Label>
-				<Form.Control controlId={this.id} required type={this.type} onChange={this.handleChange} />
-				<Form.Control.Feedback type="invalid">
-					Please provide a valid value.
-				</Form.Control.Feedback>
+				<Form.Group className="mb-4" controlId={this.id}>
+					<Form.Label className="SubtleLabel">{this.label}</Form.Label>
+					<Form.Control controlid={this.id} required type={this.type} onChange={this.handleChange} />
+				</Form.Group>
 			</>
 		);
 	}
 }
 
-//Labeled dropdown control - takes in label, field type, DOM control ID, options
+//Labeled dropdown control - takes in label, DOM control ID, options
 class Dropdown extends React.Component {
 	constructor(props) {
 		super(props);
@@ -239,17 +235,17 @@ class Dropdown extends React.Component {
 	handleChange(event) {
 		this.props.setter(event.target.value);
 	}
+	
 	render() {
 		return (
 			<>
-				<Form.Label className="subtleLabel">{this.label}</Form.Label>
-				<Form.Control as="select" required controlId={this.id} onChange={this.handleChange}>
-					<option key="null" value="">{""}</option>
-					{this.options.map(entry => <option key={entry} value={entry}>{entry}</option>)}
-				</Form.Control>
-				<Form.Control.Feedback type="invalid">
-					Please select a choice.
-				</Form.Control.Feedback>
+				<Form.Group className="mb-4" controlId={this.id}>
+					<Form.Label className="SubtleLabel">{this.label}</Form.Label>
+					<Form.Control as="select" required onChange={this.handleChange}>
+						<option key="null" value="">{""}</option>
+						{this.options.map(entry => <option key={entry} value={entry}>{entry}</option>)}
+					</Form.Control>
+				</Form.Group>
 			</>
 		);
 	}
